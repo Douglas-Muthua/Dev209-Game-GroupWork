@@ -1,11 +1,14 @@
 // create canvas and context
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+// canvas.width = 512;
+// canvas.height = 480;
+document.body.appendChild(canvas);
 // add image links
-const backgroundImage = '';
-const wizardImage = '';
-const snakeImage = '';
-const audioFile = '';
+var backgroundImage = 'images/background.png';
+var wizardImage = 'images/hero.png';
+var snakeImage = 'images/monster.png';
+var audioFile = '';
 
 // Initialize game variables
 let wizardX = canvas.width / 2;
@@ -43,6 +46,7 @@ function moveWizard(e) {
 function draw() {
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
     ctx.drawImage(wizard, wizardX, wizardY, 50, 50);
+    ctx.drawImage(snake, 50, 50);
 
     // Add logic to spawn snakes and handle collisions
 

@@ -24,7 +24,7 @@ var background = new Image();
 background.src = backgroundImage;
 
 var hero = new Image();
-herosrc = heroImage;
+hero.src = heroImage;
 
 var monsters = new Image();
 monsters.src = monstersImage;

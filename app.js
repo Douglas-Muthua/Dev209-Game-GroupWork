@@ -1,85 +1,62 @@
 // Get the canvas element and its 2D context
 var canvas = document.getElementById('gameCanvas');
 var ctx = canvas.getContext('2d');
-canvas.width = 512;
- canvas.height = 480;
+//canvas.width = 512;
+ //canvas.height = 480;
 document.body.appendChild(canvas);
 // add image links
 var backgroundImage = 'images/background.png';
-var heroImage = 'images/hero.png';
-var monstersImage = 'images/monster.png';
+var wizardImage = 'images/hero.png';
+var snakeImage = 'images/monster.png';
 var audioFile = '';
 
 
-// Set initial hero position
-let heroX = 50;
-let heroY = canvas.height / 2;
+// Initialize game variables
+let wizardX = canvas.width / 2;
+let wizardY = canvas.height / 2;
+let score = 0;
 
-// Set monster variables
-let monsterSpeed = 1;
-let monsterSize = 20;
-let monsters = [];
 // Load images and audio
-var background = new Image();
+const background = new Image();
 background.src = backgroundImage;
 
-var hero = new Image();
-hero.src = heroImage;
+const wizard = new Image();
+wizard.src = wizardImage;
 
-var monsters = new Image();
-monsters.src = monstersImage;
+const snake = new Image();
+snake.src = snakeImage;
 
-var gameAudio = new Audio(audioFile);
-// Set up keyboard input
-let keys = {};
-window.addEventListener('keydown', function (e) {
-    keys[e.keyCode] = true;
-});
-window.addEventListener('keyup', function (e) {
-    delete keys[e.keyCode];
-});
+const gameAudio = new Audio(audioFile);
 
-// Function to create a new monster
-function createMonster(x, y, dx, dy) {
-    monsters.push({ x, y, dx, dy });
+// Handle keyboard input
+document.addEventListener('keydown', moveWizard);
+
+function moveWizard(e) {
+    if (e.key === 'ArrowUp' && wizardY > 0) {
+        wizardY -= 10;
+    } else if (e.key === 'ArrowDown' && wizardY < canvas.height - 50) {
+        wizardY += 10;
+    } else if (e.key === 'ArrowLeft' && wizardX > 0) {
+        wizardX -= 10;
+    } else if (e.key === 'ArrowRight' && wizardX < canvas.width - 50) {
+        wizardX += 10;
+    }
 }
 
-// Function to update game objects
-function update() {
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+// Main game loop
+function draw() {
+    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(wizard, wizardX, wizardY, 50, 50);
 
-    // Move hero based on keyboard input
-    if (keys[38] && heroY > 0) { // Up arrow
-        heroY -= 5;
-    }
-    if (keys[40] && heroY < canvas.height - 30) { // Down arrow
-        heroY += 5;
-    }
+    // Add logic to spawn snakes and handle collisions
 
-    // Draw hero
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(heroX, heroY, 20, 30);
+    // Draw score
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.fillText('Score: ' + score, 10, 30);
 
-    // Move and draw monsters
-    for (let i = 0; i < monsters.length; i++) {
-        monsters[i].x += monsters[i].dx * monsterSpeed;
-        monsters[i].y += monsters[i].dy * monsterSpeed;
-
-        // Draw monster
-        ctx.fillStyle = 'red';
-        ctx.fillRect(monsters[i].x, monsters[i].y, monsterSize, monsterSize);
-    }
-
-    // Request next frame
-    requestAnimationFrame(update);
+    requestAnimationFrame(draw);
 }
-
-// Create monsters coming from all four directions
-createMonster(0, canvas.height / 2, 1, 0); // From left to right
-createMonster(canvas.width, canvas.height / 2, -1, 0); // From right to left
-createMonster(canvas.width / 2, 0, 0, 1); // From top to bottom
-createMonster(canvas.width / 2, canvas.height, 0, -1); // From bottom to top
 
 // Start the game loop
-update();
+draw();

@@ -1,8 +1,8 @@
 // Get the canvas element and its 2D context
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-// canvas.width = 512;
-// canvas.height = 480;
+var canvas = document.getElementById('gameCanvas');
+var ctx = canvas.getContext('2d');
+canvas.width = 512;
+ canvas.height = 480;
 document.body.appendChild(canvas);
 // add image links
 var backgroundImage = 'images/background.png';
@@ -20,16 +20,16 @@ let monsterSpeed = 1;
 let monsterSize = 20;
 let monsters = [];
 // Load images and audio
-const background = new Image();
+var background = new Image();
 background.src = backgroundImage;
 
-const hero = new Image();
+var hero = new Image();
 herosrc = heroImage;
 
-const monsters = new Image();
+var monsters = new Image();
 monsters.src = monstersImage;
 
-const gameAudio = new Audio(audioFile);
+var gameAudio = new Audio(audioFile);
 // Set up keyboard input
 let keys = {};
 window.addEventListener('keydown', function (e) {

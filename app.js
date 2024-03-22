@@ -31,6 +31,14 @@ monsterImage.onload = function () {
 };
 monsterImage.src = "images/snake.png";
 
+//mana image
+var manaReady = false;
+var manaImage = new Image();
+manaImage.onload = function () {
+    manaReady = true;
+};
+manaImage.src = "images/orb.png";
+
 
 
 //========================done creating image objects
@@ -55,6 +63,14 @@ var monster = {
     direction : 0
 
 };
+
+var mana ={
+    x: 0,
+    y: 0
+
+};
+
+var manaCollected =0
 var monstersCaught = 0;
 
 //======================  done with other variables 
@@ -156,7 +172,25 @@ var update = function (modifier) {
             console.log('got em');
             reset();       // start a new cycle
         }
-    
+
+
+
+
+        if (
+            hero.x <= (mana.x + 32)
+            && mana.x <= (hero.x + 32)
+            && hero.y <= (mana.y + 32)
+            && mana.y <= (hero.y + 32)
+            
+        ) {
+            //play when touch
+            soundEfx.src = soundhit ;
+            soundEfx.play();
+
+            ++manaCollected;       // keep track of our “score”
+            console.log('got em');
+            reset();       // start a new cycle
+        }
         // monster.x += math.random * monster.speed
         // monster.y += math.random * monster.speed
 };
@@ -181,12 +215,17 @@ var render = function () {
         
     }
 
+    if (manaReady) {
+        ctx.drawImage(manaImage, mana.x, mana.y);
+        
+    }
+
         // Score
         ctx.fillStyle = "rgb(250, 250, 250)";
         ctx.font = "24px Helvetica";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
-        ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
+        ctx.fillText("mana collected: " + manaCollected, 32, 32);
     
 
 }
@@ -222,8 +261,8 @@ var reset = function () {
 //Place the monster somewhere on the screen randomly
 // but not in the hedges, Article in wrong, the 64 needs to be 
 // hedge 32 + hedge 32 + char 32 = 96
-    // monster.x = 32 + (Math.random() * (canvas.width - 96));
-    // monster.y = 32 + (Math.random() * (canvas.height - 96));
+     mana.x = 32 + (Math.random() * (canvas.width - 96));
+     mana.y = 32 + (Math.random() * (canvas.height - 96));
     reset_monster();
 };
 

@@ -1,85 +1,242 @@
-// Get the canvas element and its 2D context
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-// canvas.width = 512;
-// canvas.height = 480;
+// Create the canvas
+var canvas = document.createElement("canvas");
+var ctx = canvas.getContext("2d");
+
+canvas.width = 828;
+canvas.height = 508;
 document.body.appendChild(canvas);
-// add image links
-var backgroundImage = 'images/background.png';
-var heroImage = 'images/hero.png';
-var monstersImage = 'images/monster.png';
-var audioFile = '';
 
 
-// Set initial hero position
-let heroX = 50;
-let heroY = canvas.height / 2;
+// Background image
+var bgReady = false;
+var bgImage = new Image();
+bgImage.onload = function () {
+    bgReady = true;
+};
+bgImage.src = "images/field.png";
 
-// Set monster variables
-let monsterSpeed = 1;
-let monsterSize = 20;
-let monsters = [];
-// Load images and audio
-const background = new Image();
-background.src = backgroundImage;
+// Hero image
+var heroReady = false;
+var heroImage = new Image();
+heroImage.onload = function () {
+    heroReady = true;
+};
+heroImage.src = "images/wizard.png";
 
-const hero = new Image();
-herosrc = heroImage;
+// Monster image
+var monsterReady = false;
+var monsterImage = new Image();
+monsterImage.onload = function () {
+    monsterReady = true;
+};
+monsterImage.src = "images/snake.png";
 
-const monsters = new Image();
-monsters.src = monstersImage;
 
-const gameAudio = new Audio(audioFile);
-// Set up keyboard input
-let keys = {};
-window.addEventListener('keydown', function (e) {
-    keys[e.keyCode] = true;
-});
-window.addEventListener('keyup', function (e) {
-    delete keys[e.keyCode];
-});
 
-// Function to create a new monster
-function createMonster(x, y, dx, dy) {
-    monsters.push({ x, y, dx, dy });
+//========================done creating image objects
+var soundhit = "sound/hit.wav"; //Game Over sound efx
+// var soundCaught = "sounds/caught.wav"; //Game Over sound efx
+//Assign audio to soundEfx
+var soundEfx = document.getElementById("soundEfx");
+
+// Game objects
+var hero = {
+    speed: 256, // movement in pixels per second
+    x: 0,  // where on the canvas are they?
+    y: 0  // where on the canvas are they?
+};
+var monster = {
+// for this version, the monster does not move, so just and x and y
+    speed: 100,
+    x: 0,
+    y: 0,
+    direction_timestamp : 0,
+    direction_interval : .5,
+    direction : 0
+
+};
+var monstersCaught = 0;
+
+//======================  done with other variables 
+
+// Handle keyboard controls
+var keysDown = {}; //object were we properties when keys go down
+                // and then delete them when the key goes up
+// so the object tells us if any key is down when that keycode
+// is down.  In our game loop, we will move the hero image if when
+// we go thru render, a key is down
+
+addEventListener("keydown", function (e) {
+    keysDown[e.keyCode] = true;
+}, false);
+
+addEventListener("keyup", function (e) {
+    delete keysDown[e.keyCode];
+}, false);
+
+function monster_movement(monster,delta){
+    let get_time = Date.now();
+    if(get_time>monster.direction_timestamp + (monster.direction_interval * 1000)){
+        // monster.y = delta * (monster.speed  + (Math.random() * (canvas.height - 96)));
+        // monster.x =delta * (monster.speed  + (Math.random() * (canvas.width - 96)));
+
+
+        monster.direction_timestamp = get_time;
+        monster.direction = Math.random() * 360;
+
+
+
+
+    }
+
+   
+        // monster.y = delta * (monster.speed  + ((canvas.height - 96)));
+        // monster.x =delta * (monster.speed  + ( (canvas.width - 96)));
+        monster.y += delta * -1 * (monster.speed * Math.sin(deg_to_rad(monster.direction)))
+        monster.x += delta * (monster.speed * Math.cos(deg_to_rad(monster.direction)))
+
+
+
+        if(monster.y <0 || monster.y > canvas.height || monster.x<0 || monster.x > canvas.width ){
+            reset_monster();
+        }
+        
+        
+
+
+
+   
+
+
 }
 
-// Function to update game objects
-function update() {
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Move hero based on keyboard input
-    if (keys[38] && heroY > 0) { // Up arrow
-        heroY -= 5;
-    }
-    if (keys[40] && heroY < canvas.height - 30) { // Down arrow
-        heroY += 5;
-    }
-
-    // Draw hero
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(heroX, heroY, 20, 30);
-
-    // Move and draw monsters
-    for (let i = 0; i < monsters.length; i++) {
-        monsters[i].x += monsters[i].dx * monsterSpeed;
-        monsters[i].y += monsters[i].dy * monsterSpeed;
-
-        // Draw monster
-        ctx.fillStyle = 'red';
-        ctx.fillRect(monsters[i].x, monsters[i].y, monsterSize, monsterSize);
-    }
-
-    // Request next frame
-    requestAnimationFrame(update);
+function deg_to_rad(deg){
+return deg * (Math.PI/180)
 }
 
-// Create monsters coming from all four directions
-createMonster(0, canvas.height / 2, 1, 0); // From left to right
-createMonster(canvas.width, canvas.height / 2, -1, 0); // From right to left
-createMonster(canvas.width / 2, 0, 0, 1); // From top to bottom
-createMonster(canvas.width / 2, canvas.height, 0, -1); // From bottom to top
+// Update game objects
+var update = function (modifier) {
+    // monster.y -= monster.speed * Math.floor(Math.random()*10);
+    // monster.y += monster.speed * Math.floor(Math.random()*);
+    // monster.x -= monster.speed * Math.floor(Math.random()*10);
+    // monster.x += monster.speed * Math.floor(Math.random()*10);
+    monster_movement(monster,modifier);
 
-// Start the game loop
-update();
+    
+    // monster.x= math.random() * canvas.width;
+
+    if (38 in keysDown && hero.y > 32+0) { //  holding up key
+        hero.y -= hero.speed * modifier;
+        
+    }
+    if (40 in keysDown && hero.y < canvas.height - (64 + 0)) { //  holding down key
+        hero.y += hero.speed * modifier;
+    }
+    if (37 in keysDown && hero.x > (32+0)) { // holding left key
+        hero.x -= hero.speed * modifier;
+    }
+    if (39 in keysDown && hero.x < canvas.width - (64 + 0)) { // holding right key
+        hero.x += hero.speed * modifier;
+    }
+    
+
+        // Are they touching?
+        if (
+            hero.x <= (monster.x + 32)
+            && monster.x <= (hero.x + 32)
+            && hero.y <= (monster.y + 32)
+            && monster.y <= (hero.y + 32)
+            
+        ) {
+            //play when touch
+            soundEfx.src = soundhit ;
+            soundEfx.play();
+
+            ++monstersCaught;       // keep track of our “score”
+            console.log('got em');
+            reset();       // start a new cycle
+        }
+    
+        // monster.x += math.random * monster.speed
+        // monster.y += math.random * monster.speed
+};
+
+
+
+
+
+// Draw everything in the main render function
+var render = function () {
+    if (bgReady) {
+        //console.log('here2');
+        ctx.drawImage(bgImage, 0, 0);
+    }
+    
+    if (heroReady) {
+        ctx.drawImage(heroImage, hero.x, hero.y);
+    }
+
+    if (monsterReady) {
+        ctx.drawImage(monsterImage, monster.x, monster.y);
+        
+    }
+
+        // Score
+        ctx.fillStyle = "rgb(250, 250, 250)";
+        ctx.font = "24px Helvetica";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
+    
+
+}
+
+// The main game loop
+var main = function () {
+    
+    var now = Date.now();
+    var delta = now - then;
+    update(delta / 1000);
+    render();
+    then = now;
+    //  Request to do this again ASAP
+    requestAnimationFrame(main);
+
+    // if ( monstersCaught === 3){
+    //     window.alert("nice job");
+    //     monstersCaught = 0
+    //     reset();
+    //     main();
+        
+
+    // }
+};
+
+
+
+// Reset the game when the player catches a monster
+var reset = function () {
+    hero.x = (canvas.width / 2) -16;
+    hero.y = (canvas.height / 2) -16;
+
+//Place the monster somewhere on the screen randomly
+// but not in the hedges, Article in wrong, the 64 needs to be 
+// hedge 32 + hedge 32 + char 32 = 96
+    // monster.x = 32 + (Math.random() * (canvas.width - 96));
+    // monster.y = 32 + (Math.random() * (canvas.height - 96));
+    reset_monster();
+};
+
+function reset_monster(){
+    monster.x = 32 + (Math.random() * (canvas.width - 96));
+    monster.y = 32 + (Math.random() * (canvas.height - 96));
+}
+
+
+
+
+
+// Let's play this game!
+var then = Date.now();
+reset();
+main();  // call the main game loop.

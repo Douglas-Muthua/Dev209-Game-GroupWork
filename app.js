@@ -43,9 +43,10 @@ manaImage.src = "images/orb.png";
 
 //========================done creating image objects
 var soundhit = "sound/hit.wav"; //Game Over sound efx
-// var soundCaught = "sounds/caught.wav"; //Game Over sound efx
+var pickup = "sound/pickup.wav"; //Game Over sound efx
 //Assign audio to soundEfx
 var soundEfx = document.getElementById("soundEfx");
+var soundEfx2 = document.getElementById("soundEfx2");
 
 // Game objects
 var hero = {
@@ -72,6 +73,8 @@ var mana ={
 
 var manaCollected =0
 var monstersCaught = 0;
+var lives =5;
+
 
 //======================  done with other variables 
 
@@ -141,17 +144,17 @@ var update = function (modifier) {
     
     // monster.x= math.random() * canvas.width;
 
-    if (38 in keysDown && hero.y > 32+0) { //  holding up key
+    if (38 in keysDown && hero.y > +0) { //  holding up key
         hero.y -= hero.speed * modifier;
         
     }
-    if (40 in keysDown && hero.y < canvas.height - (64 + 0)) { //  holding down key
+    if (40 in keysDown && hero.y < canvas.height - ( 32+ 0)) { //  holding down key
         hero.y += hero.speed * modifier;
     }
-    if (37 in keysDown && hero.x > (32+0)) { // holding left key
+    if (37 in keysDown && hero.x > (+0)) { // holding left key
         hero.x -= hero.speed * modifier;
     }
-    if (39 in keysDown && hero.x < canvas.width - (64 + 0)) { // holding right key
+    if (39 in keysDown && hero.x < canvas.width - ( 32+ 0)) { // holding right key
         hero.x += hero.speed * modifier;
     }
     
@@ -168,7 +171,8 @@ var update = function (modifier) {
             soundEfx.src = soundhit ;
             soundEfx.play();
 
-            ++monstersCaught;       // keep track of our “score”
+            ++monstersCaught; 
+            --lives;      // keep track of our “score”
             console.log('got em');
             reset();       // start a new cycle
         }
@@ -184,8 +188,8 @@ var update = function (modifier) {
             
         ) {
             //play when touch
-            soundEfx.src = soundhit ;
-            soundEfx.play();
+            soundEfx2.src = pickup ;
+            soundEfx2.play();
 
             ++manaCollected;       // keep track of our “score”
             console.log('got em');
@@ -226,6 +230,12 @@ var render = function () {
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
         ctx.fillText("mana collected: " + manaCollected, 32, 32);
+
+        ctx.fillStyle = "rgb(250, 250, 250)";
+        ctx.font = "24px Helvetica";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "top";
+        ctx.fillText("Lives: " + lives, 800, 32);
     
 
 }
@@ -241,22 +251,26 @@ var main = function () {
     //  Request to do this again ASAP
     requestAnimationFrame(main);
 
-    // if ( monstersCaught === 3){
-    //     window.alert("nice job");
-    //     monstersCaught = 0
-    //     reset();
-    //     main();
+    if ( lives === 0){
+        window.alert("you lose");
+        lives = 5;
         
 
-    // }
+        // reset();
+        // main();
+        console.log(hero);
+
+        
+
+     }
 };
 
 
 
 // Reset the game when the player catches a monster
 var reset = function () {
-    hero.x = (canvas.width / 2) -16;
-    hero.y = (canvas.height / 2) -16;
+    hero.x = (canvas.width - ( 32));
+    hero.y = (canvas.height - ( 32));
 
 //Place the monster somewhere on the screen randomly
 // but not in the hedges, Article in wrong, the 64 needs to be 
@@ -272,7 +286,16 @@ function reset_monster(){
 }
 
 
-
+// function lose(){
+//         if ( lives === 0){
+//         window.alert("you lose");
+//         lives = 5;
+//         // reset();
+//         // main();
+//         update(delta / 1000);
+        
+//         }
+//}
 
 
 // Let's play this game!
